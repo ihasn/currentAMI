@@ -1,4 +1,3 @@
-import json
 import urllib2
 from bs4 import BeautifulSoup
 import sys
@@ -34,9 +33,13 @@ def get_current_AMI_info():
     rows = tables.findChildren(['th', 'tr'])
     return rows
 
-def find_current_AMI(rows, REGIONS, VIRTLAYER):
+
+def find_current_AMI(rows, REGIONS, VIRTLAYER, user_request):
+    user_region_request = user_request[0]
+    user_virtlayer_request = user_request[1]
     region_count = 0
     virt_count = 0
+    x = 0
     for row in rows:
         cells = row.findChildren('td')
         if str(cells) == '[]':
@@ -58,20 +61,42 @@ def find_current_AMI(rows, REGIONS, VIRTLAYER):
                     elif virt_count == 3:
                         VIRTLAYER['PV Instance Store 64-bit'] = value
                     virt_count += 1
+                    if REGION == user_region_request:
+                        x = 1
                 else:
                     pass
             region_count += 1
             virt_count = 0
-            print json.dumps([REGION, {'HVM (SSD) EBS-Backed 64-bit': VIRTLAYER['HVM (SSD) EBS-Backed 64-bit'],
-                               'HVM Instance Store 64-bit': VIRTLAYER['HVM Instance Store 64-bit'],
-                               'PV EBS-Backed 64-bit': VIRTLAYER['PV EBS-Backed 64-bit'],
-                               'PV Instance Store 64-bit': VIRTLAYER['PV Instance Store 64-bit']}],
-                                sort_keys=True, indent=4, separators=(',', ': '))
+            if x == 1:
+                break
+
+def user_lookup(REGIONS, VIRTLAYER):
+    region = raw_input('Region: ')
+    if region in REGIONS:
+        virt_type = raw_input('Virt Type: ')
+        if virt_type in VIRTLAYER:
+            return region, virt_type
+        else:
+            print "Not Valid VirtLayer"
+            main()
+    else:
+        print "Not Valid Region"
+        main()
+
+
+def discover_current_AMI(user_request, VIRTLAYER):
+    region = user_request[0]
+    virt_type = user_request[1]
+    return region, VIRTLAYER[virt_type]
 
 
 def main():
+    user_request = user_lookup(REGIONS, VIRTLAYER)
     rows = get_current_AMI_info()
-    find_current_AMI(rows, REGIONS, VIRTLAYER)
+    find_current_AMI(rows, REGIONS, VIRTLAYER, user_request)
+    region_ami = discover_current_AMI(user_request, VIRTLAYER)
+    return region_ami
+
 
 if __name__ == "__main__":
     main()
