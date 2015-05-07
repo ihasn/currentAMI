@@ -24,8 +24,6 @@ TEST = currentAMItoCF.main()
 AMI = TEST[1]
 REGION = TEST[0]
 TEMPLATE = Template()
-REGION_CODE = 'eu-east-1'
-
 KEYNAME_PARAM = TEMPLATE.add_parameter(Parameter(
     "KeyName",
     Description="Name of an existing EC2 KeyPair to enable SSH "
