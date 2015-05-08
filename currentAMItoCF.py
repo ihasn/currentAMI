@@ -1,3 +1,4 @@
+# coding=utf-8
 import urllib2
 from bs4 import BeautifulSoup
 import sys
@@ -5,18 +6,46 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf8")
 
+NAME_TO_REGION = {
+    'US East N. Virginia': 'us-east-1',
+    'US West N. California': 'us-west-1',
+    'US West Oregon': 'us-west-2',
+    'EU Ireland': 'eu-west-1',
+    'EU Frankfurt': 'eu-central-1',
+    'Asia Pacific Singapore': 'ap-southeast-1',
+    'Asia Pacific Sydney': 'ap-southeast-2',
+    'Asia Pacific Tokyo': 'ap-northeast-1',
+    'South America São Paolo': 'sa-east-1',
+    'China Beijing': 'cn-north-1',
+    'AWS GovCloud': 'us-gov-west-1'
+}
+
+REGION_TO_NAME = {
+    'us-east-1': 'US East N. Virginia',
+    'us-west-1': 'US West N. California',
+    'us-west-2': 'US West Oregon',
+    'eu-west-1': 'EU Ireland',
+    'eu-central-1': 'EU Frankfurt',
+    'ap-southeast-1': 'Asia Pacific Singapore',
+    'ap-southeast-2': 'Asia Pacific Sydney',
+    'ap-northeast-1': 'Asia Pacific Tokyo',
+    'sa-east-1': 'South America São Paolo',
+    'cn-north-1': 'China Beijing',
+    'us-gov-west-1': 'AWS GovCloud'
+}
+
 REGIONS = [
-    "US East N. Virginia",
-    "US West Oregon",
-    "US West N. California",
-    "EU Ireland",
-    "EU Frakfurt",
-    "Asia Pacific Singapore",
-    "Asia Pacific Tokyo",
-    "Asia Pacific Sydney",
-    "South America Sao Paolo",
-    "China Beijing",
-    "AWS GovCloud"
+    'US East N. Virginia',
+    'US West N. California',
+    'US West Oregon',
+    'EU Ireland',
+    'EU Frankfurt',
+    'Asia Pacific Singapore',
+    'Asia Pacific Sydney',
+    'Asia Pacific Tokyo',
+    'South America São Paolo',
+    'China Beijing',
+    'AWS GovCloud'
 ]
 
 VIRTLAYER = {'HVM (SSD) EBS-Backed 64-bit': '',
@@ -70,9 +99,9 @@ def find_current_AMI(rows, REGIONS, VIRTLAYER, user_request):
             if x == 1:
                 break
 
-def user_lookup(REGIONS, VIRTLAYER):
+def user_lookup(NAME_TO_REGION, VIRTLAYER):
     region = raw_input('Region: ')
-    if region in REGIONS:
+    if region in NAME_TO_REGION:
         virt_type = raw_input('Virt Type: ')
         if virt_type in VIRTLAYER:
             return region, virt_type
@@ -91,7 +120,7 @@ def discover_current_AMI(user_request, VIRTLAYER):
 
 
 def main():
-    user_request = user_lookup(REGIONS, VIRTLAYER)
+    user_request = user_lookup(NAME_TO_REGION, VIRTLAYER)
     rows = get_current_AMI_info()
     find_current_AMI(rows, REGIONS, VIRTLAYER, user_request)
     region_ami = discover_current_AMI(user_request, VIRTLAYER)

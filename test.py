@@ -6,20 +6,6 @@ from troposphere import Base64, FindInMap, GetAtt
 from troposphere import Parameter, Output, Ref, Template
 import troposphere.ec2 as ec2
 
-EC2_REGIONS = {
-    "US East N. Virginia": "us-east-1",
-    "US West N. California": "us-west-1",
-    "US West Oregon": "us-west-2",
-    "EU Ireland": "eu-west-1",
-    "EU Frankfurt": "eu-central-1",
-    "Asia Pacific Singapore": "ap-southeast-1",
-    "Asia Pacific Sydney": "ap-southeast-2",
-    "Asia Pacific Tokyo": "ap-northeast-1",
-    "South America Sao Paolo": "sa-east-1",
-    "China Beijing": "cn-north-1",
-    "AWS GovCloud": "us-gov-west-1"
-}
-
 TEST = currentAMItoCF.main()
 AMI = TEST[1]
 REGION = TEST[0]
@@ -32,7 +18,7 @@ KEYNAME_PARAM = TEMPLATE.add_parameter(Parameter(
 ))
 
 TEMPLATE.add_mapping('RegionMap', {
-    EC2_REGIONS[REGION]: {"HVM64": AMI}
+    currentAMItoCF.NAME_TO_REGION[REGION]: {"HVM64": AMI}
 })
 
 EC2_INSTANCE = TEMPLATE.add_resource(ec2.Instance(
